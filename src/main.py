@@ -1,17 +1,9 @@
-from ollama import Client
+from agent.agent import Agent
 
-client = Client()
+agent = Agent()
 
 question = "Explique de forma concisa o que é inteligência artificial."
 
-answer = client.chat(
-    model="qwen3:4b",
-    messages=[
-        {
-            "role": "user",
-            "content": question
-        }
-    ]
-)
+answer = agent.perguntar(question)
 
-print(answer["message"]["content"])
+print(answer)
