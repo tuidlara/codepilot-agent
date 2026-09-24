@@ -1,9 +1,7 @@
-from agent.agent import Agent
+from tools.calculator import Calculator
 
-agent = Agent()
+calculator = Calculator()
 
-question = "Explique de forma concisa o que é inteligência artificial."
-
-answer = agent.perguntar(question)
-
-print(answer)
+print(calculator.calculate("1 + 1 + 3 + 5"))
+print(calculator.calculate("2 + 3 * 4"))
+print(calculator.calculate("(2 + 3) * 4"))

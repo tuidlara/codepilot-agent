@@ -5,7 +5,7 @@ class Agent:
     def __init__(self):
         self.client = Client()
         
-    def perguntar(self, question):
+    def ask(self, question):
         answer = self.client.chat(
      model="qwen3:4b",
         messages=[
