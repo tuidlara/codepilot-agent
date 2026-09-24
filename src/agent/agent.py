@@ -11,6 +11,10 @@ class Agent:
 
         messages = [
         {
+            "role": "system",
+            "content": "Você é um agente para auxiliar o usuário. Responda usando seu próprio conhecimento quando puder. Use as ferramentas disponíveis somente quando forem necessárias."
+        },
+        {
             "role": "user",
             "content": question,
         }
@@ -24,23 +28,27 @@ class Agent:
 
         messages.append(answer.message)
         
-        tool_call = answer.message.tool_calls[0]
+        if answer.message.tool_calls:
+            
+            tool_call = answer.message.tool_calls[0]
 
-        expression = tool_call.function.arguments["expression"]
+            expression = tool_call.function.arguments["expression"]
 
-        result = self.calculator.calculate(expression)
+            result = self.calculator.calculate(expression)
         
-        messages.append({
-            "role": "tool",
-            "tool_name": "calculator",
-            "content": str(result)
+            messages.append({
+                "role": "tool",
+                "tool_name": "calculator",
+                "content": str(result)
 })
-        answer = self.client.chat(
-            model="qwen3:4b",
-            messages=messages
-    )
+            answer = self.client.chat(
+                model="qwen3:4b",
+                messages=messages
+            )
 
-        return answer["message"]["content"]
+            return answer["message"]["content"]
+        else:
+            return answer["message"]["content"]
     
     tools = [
     {
