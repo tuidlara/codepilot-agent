@@ -1,7 +1,9 @@
-from tools.calculator import Calculator
+from agent.agent import Agent
 
-calculator = Calculator()
+agent = Agent()
 
-print(calculator.calculate("1 + 1 + 3 + 5"))
-print(calculator.calculate("2 + 3 * 4"))
-print(calculator.calculate("(2 + 3) * 4"))
+question = "Quanto é (15 + 5) * 3?"
+
+answer = agent.ask(question)
+
+print(answer)
