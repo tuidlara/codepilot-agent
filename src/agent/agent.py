@@ -30,7 +30,7 @@ class Agent:
 
         messages.append(answer.message)
         
-        if answer.message.tool_calls:
+        while answer.message.tool_calls:
             
             for tool_call in answer.message.tool_calls:
 
@@ -38,7 +38,12 @@ class Agent:
             
                 if tool_name == "calculator":
                     expression = tool_call.function.arguments["expression"]
-                    result = self.calculator.calculate(expression)
+                    
+                    try:
+                        result = self.calculator.calculate(expression)
+                    except ValueError as error:
+                        result = str(error)
+                        
 
                 elif tool_name == "file_reader":
                     file_path = tool_call.function.arguments["file_path"]
@@ -51,12 +56,11 @@ class Agent:
 })
             answer = self.client.chat(
                 model="qwen3:4b",
-                messages=messages
+                messages=messages,
+                tools=self.tools
             )
 
-            return answer["message"]["content"]
-        else:
-            return answer["message"]["content"]
+        return answer["message"]["content"]
     
     tools = [
     {
