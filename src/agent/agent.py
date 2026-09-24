@@ -32,22 +32,22 @@ class Agent:
         
         if answer.message.tool_calls:
             
-            tool_call = answer.message.tool_calls[0]
+            for tool_call in answer.message.tool_calls:
 
-            tool_name = tool_call.function.name
+                tool_name = tool_call.function.name
             
-            if tool_name == "calculator":
-                expression = tool_call.function.arguments["expression"]
-                result = self.calculator.calculate(expression)
+                if tool_name == "calculator":
+                    expression = tool_call.function.arguments["expression"]
+                    result = self.calculator.calculate(expression)
 
-            elif tool_name == "file_reader":
-                file_path = tool_call.function.arguments["file_path"]
-                result = self.file_reader.read(file_path)
+                elif tool_name == "file_reader":
+                    file_path = tool_call.function.arguments["file_path"]
+                    result = self.file_reader.read(file_path)
         
-            messages.append({
-                "role": "tool",
-                "tool_name": tool_name,
-                "content": str(result)
+                messages.append({
+                    "role": "tool",
+                    "tool_name": tool_name,
+                    "content": str(result)
 })
             answer = self.client.chat(
                 model="qwen3:4b",
