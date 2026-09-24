@@ -2,9 +2,6 @@ from agent.agent import Agent
 
 agent = Agent()
 
-##teste
-question = "O que é Java?"
+question = "Leia o arquivo src/teste.txt"
 
-answer = agent.ask(question)
-
-print(answer)
+print(agent.ask(question))

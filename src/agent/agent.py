@@ -1,11 +1,13 @@
 from ollama import Client
 from tools.calculator import Calculator
+from tools.file_reader import FileReader
 
 class Agent:
 
     def __init__(self):
         self.calculator = Calculator()
         self.client = Client()
+        self.file_reader = FileReader()
         
     def ask(self, question):
 
@@ -32,13 +34,19 @@ class Agent:
             
             tool_call = answer.message.tool_calls[0]
 
-            expression = tool_call.function.arguments["expression"]
+            tool_name = tool_call.function.name
+            
+            if tool_name == "calculator":
+                expression = tool_call.function.arguments["expression"]
+                result = self.calculator.calculate(expression)
 
-            result = self.calculator.calculate(expression)
+            elif tool_name == "file_reader":
+                file_path = tool_call.function.arguments["file_path"]
+                result = self.file_reader.read(file_path)
         
             messages.append({
                 "role": "tool",
-                "tool_name": "calculator",
+                "tool_name": tool_name,
                 "content": str(result)
 })
             answer = self.client.chat(
@@ -65,6 +73,23 @@ class Agent:
                     }
                 },
                 "required": ["expression"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "file_reader",
+            "description": "Lê o conteúdo de um arquivo.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "file_path": {
+                        "type": "string",
+                        "description": "Caminho do arquivo que deve ser lido."
+                    }
+                },
+                "required": ["file_path"]
             }
         }
     }
