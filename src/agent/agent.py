@@ -2,6 +2,7 @@ from ollama import Client
 from tools.calculator import Calculator
 from tools.file_reader import FileReader
 from tools.project_explorer import ProjectExplorer
+from tools.code_searcher import CodeSearcher
 
 
 class Agent:
@@ -11,16 +12,18 @@ class Agent:
         self.client = Client()
         self.file_reader = FileReader()
         self.project_explorer = ProjectExplorer()
+        self.code_searcher = CodeSearcher()
 
         self.tool_handlers = {
             "calculator": self.calculator,
             "file_reader": self.file_reader,
             "project_explorer": self.project_explorer,
+            "code_searcher": self.code_searcher,
         }
 
     def ask(self, question):
 
-        #prompt ajustado
+        # prompt ajustado
         messages = [
             {
                 "role": "system",
@@ -47,7 +50,7 @@ class Agent:
 
                 try:
                     if arguments:
-                        #pega o primeiro argumento enviado pela ferramenta
+                        # pega o primeiro argumento enviado pela ferramenta
                         argument = next(iter(arguments.values()))
                         result = tool.execute(argument)
                     else:
@@ -105,6 +108,23 @@ class Agent:
                 "name": "project_explorer",
                 "description": "Lista os arquivos do projeto para entender sua estrutura.",
                 "parameters": {"type": "object", "properties": {}, "required": []},
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "code_searcher",
+                "description": "Procura um texto ou termo nos arquivos do projeto e retorna onde ele foi encontrado.",
+                "parameters": {
+                    "type": "object",
+                    "properties": {
+                        "pattern": {
+                            "type": "string",
+                            "description": "Texto ou termo que deve ser procurado no projeto.",
+                        }
+                    },
+                    "required": ["pattern"],
+                },
             },
         },
     ]
