@@ -4,6 +4,7 @@ from pathlib import Path
 class FileReader:
 
     def __init__(self):
+        #raiz do projeto
         self.project_root = Path(__file__).resolve().parent.parent.parent
 
     def execute(self, file_path):

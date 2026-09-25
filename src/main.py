@@ -2,6 +2,6 @@ from agent.agent import Agent
 
 agent = Agent()
 
-question = "Leia o arquivo src/teste.txt e depois calcule 25 * 4."
+question = "Como funciona o calculator.py?"
 
 print(agent.ask(question))

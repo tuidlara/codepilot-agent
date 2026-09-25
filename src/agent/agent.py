@@ -1,6 +1,7 @@
 from ollama import Client
 from tools.calculator import Calculator
 from tools.file_reader import FileReader
+from tools.project_explorer import ProjectExplorer
 
 
 class Agent:
@@ -9,14 +10,17 @@ class Agent:
         self.calculator = Calculator()
         self.client = Client()
         self.file_reader = FileReader()
+        self.project_explorer = ProjectExplorer()
 
         self.tool_handlers = {
             "calculator": self.calculator,
             "file_reader": self.file_reader,
+            "project_explorer": self.project_explorer,
         }
 
     def ask(self, question):
 
+        #prompt ajustado
         messages = [
             {
                 "role": "system",
@@ -38,12 +42,16 @@ class Agent:
 
                 tool_name = tool_call.function.name
                 tool = self.tool_handlers[tool_name]
+
                 arguments = tool_call.function.arguments
 
-                argument = next(iter(arguments.values()))
-
                 try:
-                    result = tool.execute(argument)
+                    if arguments:
+                        #pega o primeiro argumento enviado pela ferramenta
+                        argument = next(iter(arguments.values()))
+                        result = tool.execute(argument)
+                    else:
+                        result = tool.execute()
                 except ValueError as error:
                     result = str(error)
 
@@ -89,6 +97,14 @@ class Agent:
                     },
                     "required": ["file_path"],
                 },
+            },
+        },
+        {
+            "type": "function",
+            "function": {
+                "name": "project_explorer",
+                "description": "Lista os arquivos do projeto para entender sua estrutura.",
+                "parameters": {"type": "object", "properties": {}, "required": []},
             },
         },
     ]
