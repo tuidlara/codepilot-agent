@@ -1,6 +1,6 @@
 from pathlib import Path
 
-
+#ler conteudo de arquivo especifico que esteja dentro do projeto
 class FileReader:
 
     def __init__(self):

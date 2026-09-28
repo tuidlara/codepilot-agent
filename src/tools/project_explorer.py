@@ -1,6 +1,6 @@
 from pathlib import Path
 
-
+#que arquivos tem dentro do projeto
 class ProjectExplorer:
 
     def __init__(self):
@@ -9,7 +9,7 @@ class ProjectExplorer:
     def execute(self):
         ignored_dirs = {".venv", ".git", "__pycache__"}
         
-        # acessa subpastas também
+        #acessa subpastas também
         #files contem só arquivos
         files = [
             file

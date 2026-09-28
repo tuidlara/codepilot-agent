@@ -5,6 +5,7 @@ from tools.project_explorer import ProjectExplorer
 from tools.code_searcher import CodeSearcher
 
 
+# orquestrador do projeto
 class Agent:
 
     def __init__(self):
@@ -14,6 +15,7 @@ class Agent:
         self.project_explorer = ProjectExplorer()
         self.code_searcher = CodeSearcher()
 
+        # ferramentas (tools)
         self.tool_handlers = {
             "calculator": self.calculator,
             "file_reader": self.file_reader,
@@ -39,6 +41,12 @@ Ferramentas disponíveis:
 - project_explorer: lista os arquivos do projeto. Use quando precisar descobrir quais arquivos existem ou entender a estrutura do projeto.
 - code_searcher: procura um texto, termo ou trecho nos arquivos do projeto e informa em quais arquivos e linhas ele aparece. Use quando precisar localizar onde determinada lógica ou código está implementado.
 
+Para analisar um arquivo:
+1. Use o file_reader para obter o conteúdo do arquivo.
+2. Analise o código retornado usando seu próprio conhecimento.
+3. Explique problemas, comportamentos ou possíveis melhorias encontrados, quando solicitado.
+4. Não invente problemas que não estejam relacionados ao código analisado.
+
 Escolha a ferramenta de acordo com a necessidade da pergunta.
 Não use ferramentas quando puder responder corretamente usando seu próprio conhecimento.
 Quando uma ferramenta retornar informações sobre o projeto, use essas informações para formular a resposta.
@@ -50,10 +58,12 @@ Quando uma ferramenta retornar informações sobre o projeto, use essas informa�
             },
         ]
 
+        # pode precisar ou não de tools para responder
         answer = self.client.chat(model="qwen3:4b", messages=messages, tools=self.tools)
 
         messages.append(answer.message)
 
+        # agente fica no loop, caso precise de mais de uma ferramenta
         while answer.message.tool_calls:
 
             for tool_call in answer.message.tool_calls:
