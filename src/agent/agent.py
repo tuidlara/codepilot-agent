@@ -78,6 +78,18 @@ Para analisar um arquivo:
 10. Diferencie claramente um problema real de uma limitação ou decisão
     intencional da implementação.
 
+Quando o usuário mencionar explicitamente vários arquivos na análise:
+
+1. Todos os arquivos mencionados pelo usuário devem ser analisados.
+2. Use o file_reader para ler cada um dos arquivos mencionados.
+3. Não finalize a análise enquanto não tiver recebido o conteúdo de todos
+   os arquivos mencionados.
+4. Compare e relacione as informações encontradas nos diferentes arquivos.
+5. Baseie a resposta somente nas informações encontradas no projeto.
+6. Não presuma como os arquivos se relacionam sem evidências no código.
+7. Se algum arquivo não puder ser lido, informe isso na resposta em vez de
+   inventar seu conteúdo.
+
 Escolha a ferramenta de acordo com a necessidade da pergunta.
 Não use ferramentas quando puder responder corretamente usando seu próprio conhecimento.
 Quando uma ferramenta retornar informações sobre o projeto, use essas informações para formular a resposta.
@@ -115,7 +127,11 @@ Quando uma ferramenta retornar informações sobre o projeto, use essas informa�
                     result = str(error)
 
                 messages.append(
-                    {"role": "tool", "tool_name": tool_name, "content": str(result)}
+                    {
+                        "role": "tool",
+                        "tool_name": tool_name,
+                        "content": f"Resultado da ferramenta {tool_name}:\n{result}",
+                    }
                 )
             answer = self.client.chat(
                 model="qwen3:4b", messages=messages, tools=self.tools
