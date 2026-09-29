@@ -4,6 +4,6 @@ from agent.agent import Agent
 
 agent = Agent()
 
-question = "Analise o calculator.py e procure possíveis problemas no código."
+question = "Analise o calculator.py. Verifique especificamente o tratamento de divisão por zero."
 
 print(agent.ask(question))
