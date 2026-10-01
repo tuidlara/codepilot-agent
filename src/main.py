@@ -1,9 +1,11 @@
 # porta de entrada do programa
 
-from tools.calculator import Calculator
+from agent.agent import Agent
 
-calculator = Calculator()
+agent = Agent()
 
-print(calculator.execute("-2 + 3"))
-print(calculator.execute("-2 * 5"))
-print(calculator.execute("(-2 + 5) * 3"))
+question = "Encontre no projeto onde está implementado o Calculator e depois me explique como ele trata divisão por zero."
+
+response = agent.ask(question)
+
+print(response)

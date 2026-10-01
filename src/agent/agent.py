@@ -38,60 +38,6 @@ class Agent:
             project_content.append(f"Arquivo: {file}\n\n{content}")
         return "\n\n" + "\n\n".join(project_content)
 
-    def analyze_file(self, file_path):
-        content = self.file_reader.execute(file_path)
-
-        messages = [
-            {
-                "role": "system",
-                "content": """
-Você é um agente de desenvolvimento de software.
-
-Analise o código fornecido e identifique apenas problemas que possam ser
-comprovados diretamente pelo código.
-
-A análise deve seguir este formato:
-
-## Possíveis bugs
-- Liste os bugs encontrados.
-- Se não houver, escreva: "Nenhum encontrado."
-
-## Riscos
-- Liste os riscos encontrados.
-- Se não houver, escreva: "Nenhum encontrado."
-
-## Melhorias
-- Liste as melhorias encontradas.
-- Se não houver, escreva: "Nenhuma necessária."
-
-## Resumo da análise
-- Explique brevemente o que foi analisado.
-
-Não invente código ou comportamentos que não estejam no arquivo.
-Não trate limitações intencionais como bugs.
-Não sugira mudanças apenas por serem consideradas boas práticas.
-Só aponte uma melhoria quando houver um problema concreto que ela resolva.
-Para cada problema apontado, indique qual parte do código justifica a conclusão.
-""",
-            },
-            {
-                "role": "user",
-                "content": f"""
-Analise o seguinte arquivo:
-
-Arquivo: {file_path}
-
-Conteúdo:
-
-{content}
-""",
-            },
-        ]
-
-        answer = self.client.chat(model="qwen3:4b", messages=messages)
-
-        return answer["message"]["content"]
-
     def ask(self, question):
         project_content = None
 
@@ -222,9 +168,6 @@ Analise o projeto seguindo as regras definidas no system prompt.
 
         # pode precisar ou não de tools para responder
         answer = self.client.chat(model="qwen3:4b", messages=messages, tools=self.tools)
-
-        print("CONTENT:", answer.message.content)
-        print("TOOL CALLS:", answer.message.tool_calls)
 
         messages.append(answer.message)
 
