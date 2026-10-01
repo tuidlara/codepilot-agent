@@ -23,7 +23,80 @@ class Agent:
             "code_searcher": self.code_searcher,
         }
 
+    def analyze_project(self):
+        files = self.project_explorer.execute()
+
+        python_files = [
+            file for file in files if file.startswith("src\\") and file.endswith(".py")
+        ]
+
+        project_content = []
+
+        for file in python_files:
+            content = self.file_reader.execute(file)
+
+            project_content.append(f"Arquivo: {file}\n\n{content}")
+        return "\n\n" + "\n\n".join(project_content)
+
+    def analyze_file(self, file_path):
+        content = self.file_reader.execute(file_path)
+
+        messages = [
+            {
+                "role": "system",
+                "content": """
+Você é um agente de desenvolvimento de software.
+
+Analise o código fornecido e identifique apenas problemas que possam ser
+comprovados diretamente pelo código.
+
+A análise deve seguir este formato:
+
+## Possíveis bugs
+- Liste os bugs encontrados.
+- Se não houver, escreva: "Nenhum encontrado."
+
+## Riscos
+- Liste os riscos encontrados.
+- Se não houver, escreva: "Nenhum encontrado."
+
+## Melhorias
+- Liste as melhorias encontradas.
+- Se não houver, escreva: "Nenhuma necessária."
+
+## Resumo da análise
+- Explique brevemente o que foi analisado.
+
+Não invente código ou comportamentos que não estejam no arquivo.
+Não trate limitações intencionais como bugs.
+Não sugira mudanças apenas por serem consideradas boas práticas.
+Só aponte uma melhoria quando houver um problema concreto que ela resolva.
+Para cada problema apontado, indique qual parte do código justifica a conclusão.
+""",
+            },
+            {
+                "role": "user",
+                "content": f"""
+Analise o seguinte arquivo:
+
+Arquivo: {file_path}
+
+Conteúdo:
+
+{content}
+""",
+            },
+        ]
+
+        answer = self.client.chat(model="qwen3:4b", messages=messages)
+
+        return answer["message"]["content"]
+
     def ask(self, question):
+        project_content = None
+
+        if "projeto inteiro" in question.lower():
+            project_content = self.analyze_project()
 
         # prompt ajustado
         messages = [
@@ -77,6 +150,24 @@ Para analisar um arquivo:
    em características da linguagem.
 10. Diferencie claramente um problema real de uma limitação ou decisão
     intencional da implementação.
+11. Não trate limitações funcionais como melhorias automaticamente.
+Uma limitação só é uma melhoria quando houver evidência concreta de que ela
+prejudica o comportamento esperado do projeto.
+
+12. Não recomende mudanças apenas porque outra abordagem seria considerada
+uma boa prática. Só sugira uma mudança quando existir um problema concreto
+no código que ela resolva.
+
+13. Não considere comportamento esperado como bug, risco ou melhoria apenas
+porque existem outras formas de implementar a mesma funcionalidade.
+
+14. Para cada problema apontado, identifique o trecho ou comportamento do
+código que comprova o problema.
+
+15. Se não houver evidência suficiente para afirmar que algo é um problema,
+não o classifique como bug, risco ou melhoria.
+
+16. Não transforme possibilidades hipotéticas em problemas reais.
 
 Quando o usuário mencionar explicitamente vários arquivos na análise:
 
@@ -90,6 +181,20 @@ Quando o usuário mencionar explicitamente vários arquivos na análise:
 7. Se algum arquivo não puder ser lido, informe isso na resposta em vez de
    inventar seu conteúdo.
 
+Quando o usuário pedir uma análise do projeto inteiro:
+
+1. O Agent fornecerá uma mensagem contendo o conteúdo dos arquivos relevantes
+   do projeto.
+2. Analise diretamente o conteúdo fornecido pelo Agent.
+3. Não use project_explorer ou file_reader novamente quando o conteúdo completo
+   do projeto já tiver sido fornecido.
+4. Analise todos os arquivos fornecidos.
+5. Compare as informações encontradas nos diferentes arquivos.
+6. Baseie a análise somente no conteúdo realmente fornecido.
+7. Não invente o conteúdo de arquivos que não foram fornecidos.
+8. Não considere arquivos de ambiente, dependências ou controle de versão,
+   como .venv, .git, __pycache__, .gitignore e README.md.
+
 Escolha a ferramenta de acordo com a necessidade da pergunta.
 Não use ferramentas quando puder responder corretamente usando seu próprio conhecimento.
 Quando uma ferramenta retornar informações sobre o projeto, use essas informações para formular a resposta.
@@ -101,8 +206,25 @@ Quando uma ferramenta retornar informações sobre o projeto, use essas informa�
             },
         ]
 
+        if project_content:
+            messages.append(
+                {
+                    "role": "user",
+                    "content": f"""
+Conteúdo completo do projeto para análise:
+
+{project_content}
+
+Analise o projeto seguindo as regras definidas no system prompt.
+""",
+                }
+            )
+
         # pode precisar ou não de tools para responder
         answer = self.client.chat(model="qwen3:4b", messages=messages, tools=self.tools)
+
+        print("CONTENT:", answer.message.content)
+        print("TOOL CALLS:", answer.message.tool_calls)
 
         messages.append(answer.message)
 

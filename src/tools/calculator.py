@@ -21,6 +21,14 @@ class Calculator:
         if isinstance(node, ast.Constant) and isinstance(node.value, (int, float)):
             return node.value
 
+        if isinstance(node, ast.UnaryOp) and isinstance(node.op, (ast.USub, ast.UAdd)):
+            value = self._calculate_node(node.operand, allowed_operators)
+
+            if isinstance(node.op, ast.USub):
+                return -value
+
+            return value
+
         if isinstance(node, ast.BinOp) and type(node.op) in allowed_operators:
             left = self._calculate_node(node.left, allowed_operators)
             right = self._calculate_node(node.right, allowed_operators)

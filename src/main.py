@@ -1,9 +1,9 @@
-#porta de entrada do programa
+# porta de entrada do programa
 
-from agent.agent import Agent
+from tools.calculator import Calculator
 
-agent = Agent()
+calculator = Calculator()
 
-question = "Analise a integração entre agent.py, calculator.py e file_reader.py. Explique como o Agent chama essas duas ferramentas, quais argumentos envia e como os resultados retornam para o Agent."
-
-print(agent.ask(question))
+print(calculator.execute("-2 + 3"))
+print(calculator.execute("-2 * 5"))
+print(calculator.execute("(-2 + 5) * 3"))
