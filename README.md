@@ -109,3 +109,7 @@ This project was built to understand the fundamentals behind AI agents:
 - Providing project context to the model
 
 The goal was to build a small, understandable agent from scratch without relying on an agent framework.
+
+## Author
+
+**Arthur de Lara**
